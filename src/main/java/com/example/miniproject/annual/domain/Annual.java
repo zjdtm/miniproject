@@ -1,14 +1,17 @@
 package com.example.miniproject.annual.domain;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.example.miniproject.constant.Category;
+import com.example.miniproject.constant.Reason;
 import com.example.miniproject.constant.Status;
 import com.example.miniproject.member.domain.Member;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,10 +23,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Annual {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,11 +45,13 @@ public class Annual {
 	@NotBlank
 	private String title;
 	@NotNull
-	private LocalDateTime startedAt;
+	private LocalDate startedAt;
 	@NotNull
-	private LocalDateTime lastedAt;
-	@NotBlank
-	private String content;
+	private LocalDate lastedAt;
+
+	@NotNull
+	@Column(name = "content")
+	private Reason reason;
 
 	@NotNull
 	@Enumerated(EnumType.STRING)
