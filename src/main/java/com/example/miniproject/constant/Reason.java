@@ -1,5 +1,7 @@
 package com.example.miniproject.constant;
 
+import java.util.Arrays;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,4 +15,11 @@ public enum Reason {
 	OTHER("기타휴가");
 
 	private String name;
+
+	public static Reason findByName(String name) {
+		return Arrays.stream(Reason.values())
+			.filter(reason -> reason.name.equals(name))
+			.findFirst()
+			.orElseThrow();
+	}
 }
