@@ -11,6 +11,7 @@ import com.example.miniproject.constant.Reason;
 import com.example.miniproject.constant.Status;
 import com.example.miniproject.member.domain.Member;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -61,9 +62,10 @@ public class Annual {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@NotNull
+	@Column(nullable = false)
 	@CreationTimestamp
 	private LocalDateTime createdAt;
+
 	@UpdateTimestamp
 	private LocalDateTime modifiedAt;
 }
