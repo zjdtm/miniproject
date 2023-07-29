@@ -1,5 +1,6 @@
 package com.example.miniproject.member.domain;
 
+import com.example.miniproject.constant.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -21,15 +22,16 @@ public class Member {
     private String name;
 
     @NotBlank
-    @Email
     @Column(unique = true)
     private String email;
 
     @NotBlank
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,16}$")
     private String password;
 
-    @NotBlank
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @NotNull
     @PastOrPresent
     private LocalDateTime joinedAt;
 
