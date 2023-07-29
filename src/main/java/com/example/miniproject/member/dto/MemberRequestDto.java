@@ -2,37 +2,61 @@ package com.example.miniproject.member.dto;
 
 import com.example.miniproject.member.domain.Member;
 import com.example.miniproject.util.AESUtil;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
-@Getter
-@Setter
 public class MemberRequestDto {
 
-    @NotNull
-    private String name;
+    @Getter
+    @Builder
+    public static class CreateMember {
 
-    @NotNull
-    private String email;
+        @NotNull
+        private String name;
 
-    @NotNull
-    private String password;
+        @NotNull
+        @Email
+        private String email;
 
-    @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime join;
+        @NotNull
+        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,16}$")
+        private String password;
 
-    public Member toEntity(String password) {
+        @NotNull
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        private LocalDate join;
 
-        return Member.builder()
-                .name(AESUtil.encrypt(name))
-                .email(AESUtil.encrypt(email))
-                .password(password)
-                .joinedAt(join)
-                .build();
+        public Member toEntity(String password) {
+
+            return Member.builder()
+                    .name(AESUtil.encrypt(name))
+                    .email(AESUtil.encrypt(email))
+                    .password(password)
+                    .joinedAt(join.atStartOfDay())
+                    .build();
+        }
+
     }
+
+    @Getter
+    @Builder
+    public static class LoginMember {
+
+        @NotNull
+        @Email
+        private String email;
+
+        @NotNull
+        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,16}$")
+        private String password;
+
+    }
+
+
 }
