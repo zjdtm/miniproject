@@ -4,7 +4,12 @@ import java.time.format.DateTimeFormatter;
 
 import com.example.miniproject.annual.domain.Annual;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class AdminResponseDto {
+	@Getter
+	@Setter
 	public static class MainDto {
 		private Long id;
 		private String name;
