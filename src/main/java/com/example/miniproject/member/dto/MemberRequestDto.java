@@ -1,5 +1,6 @@
 package com.example.miniproject.member.dto;
 
+import com.example.miniproject.constant.Role;
 import com.example.miniproject.member.domain.Member;
 import com.example.miniproject.util.AESUtil;
 import jakarta.validation.constraints.Email;
@@ -38,6 +39,7 @@ public class MemberRequestDto {
                     .name(AESUtil.encrypt(name))
                     .email(AESUtil.encrypt(email))
                     .password(password)
+                    .role(Role.USER)
                     .joinedAt(join.atStartOfDay())
                     .build();
         }
