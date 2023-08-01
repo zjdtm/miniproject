@@ -8,7 +8,9 @@ import com.example.miniproject.admin.dto.AdminRequestDto;
 import com.example.miniproject.admin.dto.AdminResponseDto;
 import com.example.miniproject.annual.domain.Annual;
 import com.example.miniproject.annual.repository.AnnualRepository;
+import com.example.miniproject.constant.ErrorCode;
 import com.example.miniproject.constant.Status;
+import com.example.miniproject.exception.AnnualException;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -32,11 +34,9 @@ public class AdminService {
 	public boolean updateStatus(AdminRequestDto.ApplyDto applyDto) {
 		Annual annualPs = entityManager.find(Annual.class, applyDto.getId());
 
-		//@TODO: Exception 처리
 		if (annualPs == null)
-			return false;
+			throw new AnnualException(ErrorCode.ANNUAL_NOT_FOUND);
 
-		//@TODO: 결재 반려는 없는지? 확인
 		annualPs.setStatus(Status.COMPLETE);
 
 		return true;

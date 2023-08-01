@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	private final AdminService adminService;
 
-	//@TODO: 권한체크
 	@GetMapping("/")
 	public List<AdminResponseDto.MainDto> main() {
 		List<AdminResponseDto.MainDto> mainDtos = adminService.getAnnuals();
@@ -30,11 +29,9 @@ public class AdminController {
 		return mainDtos;
 	}
 
-	//@TODO: 권한체크
 	@PostMapping("/apply")
 	public ResponseEntity<?> apply(@RequestBody @Valid AdminRequestDto.ApplyDto applyDto) {
-		boolean result = adminService.updateStatus(applyDto);
-		//@TODO: Exception 처리
+		adminService.updateStatus(applyDto);
 
 		return ResponseEntity.ok().build();
 	}
