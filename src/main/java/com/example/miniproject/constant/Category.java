@@ -2,6 +2,8 @@ package com.example.miniproject.constant;
 
 import java.util.Arrays;
 
+import com.example.miniproject.exception.AnnualException;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,6 +18,6 @@ public enum Category {
 		return Arrays.stream(Category.values())
 			.filter(category -> category.name.equals(name))
 			.findFirst()
-			.orElseThrow();
+			.orElseThrow(() -> new AnnualException(ErrorCode.CATEGORY_NOT_FOUND));
 	}
 }

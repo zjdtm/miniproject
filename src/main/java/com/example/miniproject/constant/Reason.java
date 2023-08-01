@@ -2,6 +2,8 @@ package com.example.miniproject.constant;
 
 import java.util.Arrays;
 
+import com.example.miniproject.exception.AnnualException;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,6 +22,6 @@ public enum Reason {
 		return Arrays.stream(Reason.values())
 			.filter(reason -> reason.name.equals(name))
 			.findFirst()
-			.orElseThrow();
+			.orElseThrow(() -> new AnnualException(ErrorCode.REASON_NOT_FOUND));
 	}
 }
