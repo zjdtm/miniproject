@@ -38,4 +38,21 @@ public class AnnualController {
 
 		return ResponseEntity.ok().build();
 	}
+
+	@PostMapping("/annual/cancel")
+	public ResponseEntity<?> cancel(@RequestBody @Valid AnnualRequestDto.CancelDto cancelDto,
+		@AuthenticationPrincipal PrincipalDetails principalDetails) {
+		annualService.deleteAnnual(cancelDto, principalDetails.getUsername());
+
+		return ResponseEntity.ok().build();
+	}
+
+	@PostMapping("/annual/update")
+	public ResponseEntity<?> update(@RequestBody @Valid AnnualRequestDto.UpdateDto updateDto,
+		@AuthenticationPrincipal PrincipalDetails principalDetails) {
+
+		annualService.updateAnnual(updateDto, principalDetails.getUsername());
+		
+		return ResponseEntity.ok().build();
+	}
 }
