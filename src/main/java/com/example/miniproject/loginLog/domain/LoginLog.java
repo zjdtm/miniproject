@@ -1,13 +1,13 @@
 package com.example.miniproject.loginLog.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.miniproject.member.domain.Member;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -21,10 +21,17 @@ public class LoginLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberId")
+    private Member member;
+
+    @NotNull
     private String userAgent;
 
+    @NotNull
     private String clientIp;
 
-    private LocalDateTime createdAt;
+    @CreationTimestamp
+    private LocalDateTime successLoginDate;
 
 }
