@@ -31,15 +31,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
+        // Header 값에 토큰이 존재하는지 검증
         String authorizationHeader = request.getHeader(HEADER_AUTHORIZATION);
-
         if (authorizationHeader == null || !authorizationHeader.startsWith(TOKEN_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // Header 에 jwt 만 추출하기
         String jwt = authorizationHeader.substring(7);
+
+        // jwt 에 email 값만 추출
         String userEmail = jwtService.extractUsername(jwt);
+
+        // SecurityContextHolder 에 저장된 회원과 email 이 같은지 검증
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = principalDetailService.loadUserByUsername(userEmail);
             if (jwtService.validToken(jwt, userDetails)) {
