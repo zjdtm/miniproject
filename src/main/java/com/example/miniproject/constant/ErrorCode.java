@@ -16,7 +16,12 @@ public enum ErrorCode {
 	ANNUAL_NOT_FOUND(HttpStatus.NOT_FOUND, "연차/당직 정보가 없습니다."),
 	MEMBER_EMAIL_DUPLICATED(HttpStatus.BAD_REQUEST, "해당 이메일로 가입된 회원이 있습니다."),
 	CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "카테고리를 찾을 수 없습니다."),
-	REASON_NOT_FOUND(HttpStatus.BAD_REQUEST, "연차 종류를 찾을 수 없습니다.");
+	REASON_NOT_FOUND(HttpStatus.BAD_REQUEST, "연차 종류를 찾을 수 없습니다."),
+
+	MEMBER_PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
+
+	TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "인증 정보가 만료되었습니다."),
+	TOKEN_NOT_MATCH(HttpStatus.BAD_REQUEST, "인증 정보가 일치하지 않습니다.");
 
 	private HttpStatus status;
 	private String message;
