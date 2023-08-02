@@ -1,7 +1,5 @@
 package com.example.miniproject.member.controller;
 
-import com.example.miniproject.jwt.service.TokenService;
-import com.example.miniproject.member.dto.MemberRequestDto;
 import com.example.miniproject.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -9,13 +7,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import static com.example.miniproject.jwt.dto.TokenDto.ResponseToken;
+import static com.example.miniproject.member.dto.MemberRequestDto.CreateMember;
+import static com.example.miniproject.member.dto.MemberRequestDto.LoginMember;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,10 +22,11 @@ import java.util.Map;
 public class MemberController {
 
     private final MemberService memberService;
-    private final TokenService tokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid MemberRequestDto.CreateMember memberRequestDto) {
+    public ResponseEntity<String> register(
+            @RequestBody @Valid CreateMember memberRequestDto
+    ) {
 
         memberService.register(memberRequestDto);
 
@@ -36,13 +36,12 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<String> login(
             HttpServletRequest request,
-            Authentication authentication,
-            @RequestBody @Valid MemberRequestDto.LoginMember memberRequestDto
+            @RequestBody @Valid LoginMember memberRequestDto
     ) {
 
-        Map<String, String> tokens = memberService.login(request, memberRequestDto);
+        ResponseToken responseToken = memberService.login(request, memberRequestDto);
 
-        ResponseCookie responseCookie = ResponseCookie.from(tokens.get("refreshToken"))
+        ResponseCookie responseCookie = ResponseCookie.from(responseToken.getAccessToken())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -53,7 +52,7 @@ public class MemberController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .body(tokens.get("refreshToken"));
+                .body(responseToken.getRefreshToken());
     }
 
 }
