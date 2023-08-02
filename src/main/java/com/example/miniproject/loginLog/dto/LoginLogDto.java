@@ -1,6 +1,7 @@
 package com.example.miniproject.loginLog.dto;
 
 import com.example.miniproject.loginLog.domain.LoginLog;
+import com.example.miniproject.member.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,18 +15,21 @@ public class LoginLogDto {
 
         private Long userId;
 
+        private Member member;
+
         private String userAgent;
 
         private String clientIp;
 
-        private LocalDateTime createdAt;
+        private LocalDateTime successLoginDate;
 
         public LoginLog toEntity() {
             return LoginLog.builder()
                     .id(userId)
+                    .member(member)
                     .userAgent(userAgent)
                     .clientIp(clientIp)
-                    .createdAt(createdAt)
+                    .successLoginDate(successLoginDate)
                     .build();
         }
 
