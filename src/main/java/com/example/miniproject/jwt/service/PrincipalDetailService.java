@@ -1,9 +1,10 @@
 package com.example.miniproject.jwt.service;
 
+import com.example.miniproject.constant.ErrorCode;
+import com.example.miniproject.exception.MemberException;
 import com.example.miniproject.member.domain.Member;
 import com.example.miniproject.member.domain.PrincipalDetails;
 import com.example.miniproject.member.repository.MemberRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +22,7 @@ public class PrincipalDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
         return new PrincipalDetails(member);
     }
