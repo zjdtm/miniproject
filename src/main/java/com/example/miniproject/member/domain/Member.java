@@ -2,8 +2,12 @@ package com.example.miniproject.member.domain;
 
 import com.example.miniproject.constant.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -35,8 +39,10 @@ public class Member {
     @PastOrPresent
     private LocalDateTime joinedAt;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     private LocalDateTime modifiedAt;
 
     public void changeName(String newName) {
