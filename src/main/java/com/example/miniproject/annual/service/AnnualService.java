@@ -52,24 +52,6 @@ public class AnnualService {
 
 	}
 
-	// public void setAnnualTotalByMember(Member member) {
-	// 	String queryString = "SELECT a.annual_total " +
-	// 		"FROM annual a " +
-	// 		"WHERE (a.years, a.hist_year) IN (" +
-	// 		"SELECT MAX(a2.years), MAX(a2.hist_year) " +
-	// 		"FROM annual a2 " +
-	// 		"WHERE a2.years <= (SELECT TIMESTAMPDIFF(YEAR, m.joined_at, NOW()) FROM member m WHERE m.email = :email)" +
-	// 		")";
-	// 	Query nativeQuery = entityManager.createNativeQuery(queryString);
-	// 	nativeQuery.setParameter("email", member.getEmail());
-	// 	List<Integer> results = nativeQuery.getResultList();
-	//
-	// 	if (results == null || results.size() == 0)
-	// 		throw new AnnualException(ErrorCode.ANNUAL_TOTAL_NOT_FOUND);
-	//
-	// 	member.setAnnualTotal(results.get(0));
-	// }
-
 	@Transactional
 	public void deleteAnnual(AnnualRequestDto.CancelDto cancelDto, String email) {
 		Annual annual = annualRepository.findById(cancelDto.getId())
@@ -90,5 +72,33 @@ public class AnnualService {
 			throw new MemberException(ErrorCode.MEMBER_NOT_MATCHED);
 
 		annual.updateData(updateDto);
+	}
+
+	public AnnualResponseDto.MyPageDto findAnnualsByMember(String email) {
+		Member member = memberRepository.findByEmail(email)
+			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+		List<Annual> annuals = findAllByMemberAndCategory(member, Category.ANNUAL);
+		List<Annual> duties = findAllByMemberAndCategory(member, Category.DUTY);
+
+		List<AnnualResponseDto.AnnualHistroy> annualHistroys = annuals.stream()
+			.map(annual -> new AnnualResponseDto.AnnualHistroy(annual))
+			.collect(
+				Collectors.toList());
+		;
+
+		List<AnnualResponseDto.DutyHistory> dutyHistories = duties.stream()
+			.map(duty -> new AnnualResponseDto.DutyHistory(duty))
+			.collect(
+				Collectors.toList());
+		;
+
+		return new AnnualResponseDto.MyPageDto(member, annualHistroys, dutyHistories);
+	}
+
+	private List<Annual> findAllByMemberAndCategory(Member member, Category category) {
+		List<Annual> annuals = annualRepository.findAllByMemberAndCategory(member, category);
+
+		return annuals;
 	}
 }

@@ -14,6 +14,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -56,6 +58,13 @@ public class Member {
 
 	@UpdateTimestamp
 	private LocalDateTime modifiedAt;
+
+	@OneToOne()
+	@JoinColumn(name = "annual_amount_id")
+	private TotalAnnual totalAnnual;
+
+	private int annualUsed;
+	private int annualRemain;
 
 	public void changeName(String newName) {
 		this.name = newName;

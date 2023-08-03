@@ -19,7 +19,9 @@ import com.example.miniproject.jwt.service.JwtService;
 import com.example.miniproject.loginLog.dto.LoginLogDto;
 import com.example.miniproject.loginLog.service.LoginLogService;
 import com.example.miniproject.member.domain.Member;
+import com.example.miniproject.member.domain.TotalAnnual;
 import com.example.miniproject.member.repository.MemberRepository;
+import com.example.miniproject.member.repository.TotalAnnualRepository;
 import com.example.miniproject.util.AESUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,14 +40,19 @@ public class MemberService {
 	private final RedisTemplate<String, String> redisTemplate;
 	private final BCryptPasswordEncoder passwordEncoder;
 
+	private final TotalAnnualRepository totalAnnualRepository;
+
 	// 회원가입
 	public void register(CreateMember memberRequestDto) {
 
 		duplicateMemberCheck(memberRequestDto.getEmail());
 
+		TotalAnnual totalAnnual = findTotalAnnual(memberRequestDto.getJoin().atStartOfDay());
+
 		Member member = memberRequestDto.toEntity(
-			passwordEncoder.encode(memberRequestDto.getPassword())
+			passwordEncoder.encode(memberRequestDto.getPassword()), totalAnnual
 		);
+
 		memberRepository.save(member);
 	}
 
@@ -101,5 +108,14 @@ public class MemberService {
 	private void duplicateMemberCheck(String email) {
 		if (memberRepository.existsByEmail(email))
 			throw new MemberException(ErrorCode.MEMBER_EMAIL_DUPLICATED);
+	}
+
+	private TotalAnnual findTotalAnnual(LocalDateTime joinedAt) {
+		int years = LocalDateTime.now().getYear() - joinedAt.getYear() + 1;
+
+		TotalAnnual totalAnnual = totalAnnualRepository.findAnnualAmountByYears(years)
+			.orElseThrow(() -> new MemberException(ErrorCode.ANNUAL_TOTAL_NOT_FOUND));
+
+		return totalAnnual;
 	}
 }
