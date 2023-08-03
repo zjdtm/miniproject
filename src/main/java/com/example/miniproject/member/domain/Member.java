@@ -77,4 +77,12 @@ public class Member {
 	public boolean isNotEqualsEmail(String email) {
 		return !this.email.equals(email);
 	}
+
+	public void sumAnnualUsed(int value) {
+		this.annualUsed += value;
+	}
+
+	public void sumAnnualRemain(int value) {
+		this.annualRemain += value;
+	}
 }

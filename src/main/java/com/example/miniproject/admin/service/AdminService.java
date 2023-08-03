@@ -12,6 +12,9 @@ import com.example.miniproject.annual.repository.AnnualRepository;
 import com.example.miniproject.constant.ErrorCode;
 import com.example.miniproject.constant.Status;
 import com.example.miniproject.exception.AnnualException;
+import com.example.miniproject.exception.MemberException;
+import com.example.miniproject.member.domain.Member;
+import com.example.miniproject.member.repository.MemberRepository;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminService {
 	private final AnnualRepository annualRepository;
+	private final MemberRepository memberRepository;
 	private final EntityManager entityManager;
 
 	public List<AdminResponseDto.MainDto> getAnnuals() {
@@ -33,7 +37,7 @@ public class AdminService {
 	}
 
 	@Transactional
-	public boolean updateStatus(AdminRequestDto.ApplyDto applyDto) {
+	public boolean updateStatus(AdminRequestDto.ApplyDto applyDto, String email) {
 		Annual annualPs = entityManager.find(Annual.class, applyDto.getId());
 
 		if (annualPs == null)
@@ -41,6 +45,16 @@ public class AdminService {
 
 		annualPs.setStatus(Status.COMPLETE);
 
+		updateAnnualAmount(annualPs.getMember().getEmail());
+
 		return true;
+	}
+
+	private void updateAnnualAmount(String email) {
+		Member member = memberRepository.findByEmail(email)
+			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+		member.sumAnnualRemain(-1);
+		member.sumAnnualUsed(1);
 	}
 }
