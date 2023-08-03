@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import com.example.miniproject.annual.domain.Annual;
+import com.example.miniproject.member.domain.Member;
 import com.example.miniproject.util.AESUtil;
 import com.example.miniproject.util.DateUtil;
 
@@ -38,12 +39,24 @@ public class AnnualResponseDto {
 	public static class MyPageDto {
 		private String name;
 		private int annualBalance;
+		private int annualUsed;
+		private int annualRemain;
 		private List<AnnualHistroy> annualHistroies;
 		private List<DutyHistory> dutyHistories;
+
+		public MyPageDto(Member member, List<AnnualHistroy> annualHistroies, List<DutyHistory> dutyHistories) {
+			this.name = AESUtil.decrypt(member.getName());
+			this.annualBalance = member.getTotalAnnual().getAnnualAmount();
+			this.annualUsed = member.getAnnualUsed();
+			this.annualRemain = member.getAnnualRemain();
+			this.annualHistroies = annualHistroies;
+			this.dutyHistories = dutyHistories;
+		}
 	}
 
 	@Getter
-	private class AnnualHistroy {
+	@Setter
+	public static class AnnualHistroy {
 		private Long id;
 		private String title;
 		private String reason;
@@ -51,7 +64,7 @@ public class AnnualResponseDto {
 		private String endDate;
 		private String status;
 
-		private AnnualHistroy(Annual annual) {
+		public AnnualHistroy(Annual annual) {
 			this.id = annual.getId();
 			this.title = annual.getTitle();
 			this.reason = annual.getReason().getName();
@@ -62,14 +75,15 @@ public class AnnualResponseDto {
 	}
 
 	@Getter
-	private class DutyHistory {
+	@Setter
+	public static class DutyHistory {
 		private Long id;
 		private String title;
 		private String startDate;
 		private String endDate;
 		private String status;
 
-		private DutyHistory(Annual annual) {
+		public DutyHistory(Annual annual) {
 			this.id = annual.getId();
 			this.title = annual.getTitle();
 			this.startDate = DateUtil.toDateFormat(annual.getStartedAt());

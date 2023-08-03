@@ -52,7 +52,14 @@ public class AnnualController {
 		@AuthenticationPrincipal PrincipalDetails principalDetails) {
 
 		annualService.updateAnnual(updateDto, principalDetails.getUsername());
-		
+
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/user")
+	public AnnualResponseDto.MyPageDto myPage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+		AnnualResponseDto.MyPageDto myPageDto = annualService.findAnnualsByMember(principalDetails.getUsername());
+
+		return myPageDto;
 	}
 }
