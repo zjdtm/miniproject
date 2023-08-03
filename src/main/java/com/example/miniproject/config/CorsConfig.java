@@ -7,6 +7,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import java.util.Arrays;
+
 @Configuration
 public class CorsConfig {
 
@@ -15,11 +17,10 @@ public class CorsConfig {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
-		config.addAllowedOriginPattern("*");
-		config.addAllowedMethod("*"); // 허용할 Header
-		config.addAllowedHeader("*"); // 허용할 Http Method
-		config.addExposedHeader(HttpHeaders.SET_COOKIE); // Set-Cookie 만 허용
-		source.registerCorsConfiguration("/api/**", config);
+		config.setAllowedOriginPatterns(Arrays.asList("*"));
+		config.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST")); // 허용할 Header
+		config.setExposedHeaders(Arrays.asList(HttpHeaders.SET_COOKIE)); // Set-Cookie 만 허용
+		source.registerCorsConfiguration("/**", config);
 
 		return new CorsFilter(source);
 	}
