@@ -41,18 +41,18 @@ public class MemberController {
 
         ResponseToken responseToken = memberService.login(request, memberRequestDto);
 
-        ResponseCookie responseCookie = ResponseCookie.from(responseToken.getAccessToken())
+        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", responseToken.getRefreshToken())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(60)
-                .sameSite("None")           // TODO : why use sameSite ?
-//                .domain("localhost:8080") // TODO : front-end domain
+                .maxAge(60)     // TODO : 기본으로 60초로 설정
+                .sameSite("None")            // TODO : why use sameSite ?
+                .domain("localhost")    // TODO : front-end domain
                 .build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .body(responseToken.getRefreshToken());
+                .body(responseToken.getAccessToken());
     }
 
 }
