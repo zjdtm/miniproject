@@ -17,9 +17,10 @@ public class CorsConfig {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
-		config.setAllowedOriginPatterns(Arrays.asList("*"));
-		config.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST")); // 허용할 Header
-		config.setExposedHeaders(Arrays.asList(HttpHeaders.SET_COOKIE)); // Set-Cookie 만 허용
+		config.addAllowedOriginPattern("*");
+		config.addAllowedMethod("*");
+		config.addExposedHeader(HttpHeaders.SET_COOKIE);
+
 		source.registerCorsConfiguration("/**", config);
 
 		return new CorsFilter(source);
