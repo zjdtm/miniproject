@@ -7,11 +7,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -21,6 +23,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final RedisTemplate redisTemplate;
     private final PrincipalDetailService principalDetailService;
     private final static String HEADER_AUTHORIZATION = "Authorization";
     private final static String TOKEN_PREFIX = "Bearer ";
@@ -48,13 +51,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = principalDetailService.loadUserByUsername(userEmail);
             if (jwtService.validToken(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        userDetails.getPassword(),
-                        userDetails.getAuthorities()
-                );
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                // redis 에 accessToken logout 여부 확인
+                String isLogout = (String) redisTemplate.opsForValue().get(jwt);
+
+                // isLogout 이 비어 있는 경우에는 정상적으로 처리하기
+                if(ObjectUtils.isEmpty(isLogout)) {
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            userDetails.getPassword(),
+                            userDetails.getAuthorities()
+                    );
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
             }
         }
 

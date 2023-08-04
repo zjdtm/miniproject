@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,18 +42,30 @@ public class MemberController {
 
         ResponseToken responseToken = memberService.login(request, memberRequestDto);
 
+        // Cookie 에 refreshToken 을 저장함 이때 value 값은 UUID.randomUUID() !!
         ResponseCookie responseCookie = ResponseCookie.from("refreshToken", responseToken.getRefreshToken())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(60)     // TODO : 기본으로 60초로 설정
-                .sameSite("None")            // TODO : why use sameSite ?
-                .domain("localhost")    // TODO : front-end domain
+                .maxAge(60 * 60 * 24 * 30)
+                .sameSite("None")
+                .domain("local.miniproject-team9.p-e.kr")
                 .build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body(responseToken.getAccessToken());
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(
+            HttpServletRequest request, Authentication authentication
+    ) {
+
+        memberService.logout(request, authentication);
+
+        return ResponseEntity.ok()
+                .body("로그아웃에 성공하였습니다.");
     }
 
 }
