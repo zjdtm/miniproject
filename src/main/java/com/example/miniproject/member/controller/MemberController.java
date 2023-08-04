@@ -49,7 +49,7 @@ public class MemberController {
                 .path("/")
                 .maxAge(60 * 60 * 24 * 30)
                 .sameSite("None")
-                .domain("local.miniproject-team9.p-e.kr")
+                .domain("localhost")
                 .build();
 
         return ResponseEntity.ok()
