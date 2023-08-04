@@ -31,9 +31,9 @@ public class TokenApiController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(60)     // TODO : 기본으로 60초로 설정
+                .maxAge(60 * 60 * 24 * 30)     // TODO : 기본으로 60초로 설정
                 .sameSite("None")            // TODO : why use sameSite ?
-                .domain("local.miniproject-team9.p-e.kr")    // TODO : front-end domain
+                .domain("localhost")    // TODO : front-end domain
                 .build();
 
         return ResponseEntity.ok()

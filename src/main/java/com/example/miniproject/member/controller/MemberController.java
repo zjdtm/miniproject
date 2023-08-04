@@ -47,7 +47,7 @@ public class MemberController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(60 * 60 * 24 * 30)
+                .maxAge(60 * 60 * 24 * 30)  // TODO : 토큰 유효기간 설정해야함
                 .sameSite("None")
                 .domain("localhost")
                 .build();
