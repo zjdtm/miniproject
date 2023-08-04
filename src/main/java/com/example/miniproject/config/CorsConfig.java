@@ -23,6 +23,7 @@ public class CorsConfig {
 
 		source.registerCorsConfiguration("/**", config);
 
+		// Cors 전체 허용으로 변경
 		return new CorsFilter(source);
 	}
 
