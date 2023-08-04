@@ -1,5 +1,7 @@
 package com.example.miniproject.annotation.validator;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 
 import com.example.miniproject.annotation.AfterStartDate;
@@ -11,17 +13,22 @@ public class AfterStartDateValidator implements ConstraintValidator<AfterStartDa
 	@Override
 	public boolean isValid(Object object, ConstraintValidatorContext context) {
 		try {
-			LocalDate startDate = LocalDate.parse(object.getClass().getField("startDate").toString());
-			LocalDate endDate = LocalDate.parse(object.getClass().getField("endDate").toString());
+			Method getStartDateMethod = object.getClass().getMethod("getStartDate");
+			Method getEndDateMethod = object.getClass().getMethod("getEndDate");
 
+			LocalDate startDate = LocalDate.parse((String)getStartDateMethod.invoke(object));
+			LocalDate endDate = LocalDate.parse((String)getEndDateMethod.invoke(object));
 			if (startDate == null || endDate == null)
 				return false;
 
 			return endDate.isAfter(startDate);
-		} catch (NoSuchFieldException e) {
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (InvocationTargetException e) {
+			throw new RuntimeException(e);
+		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
-
 	}
 
 	@Override

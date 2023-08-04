@@ -16,6 +16,7 @@ import lombok.Setter;
 public class AnnualRequestDto {
 	@Getter
 	@Setter
+	@AfterStartDate
 	public static class SaveDto {
 		@NotNull
 		private String title;
@@ -24,7 +25,6 @@ public class AnnualRequestDto {
 		@NotNull
 		private String startDate;
 		@NotNull
-		@AfterStartDate
 		private String endDate;
 		private String reason;
 
@@ -50,6 +50,7 @@ public class AnnualRequestDto {
 
 	@Getter
 	@Setter
+	@AfterStartDate
 	public static class UpdateDto {
 		@NotNull
 		private Long id;
