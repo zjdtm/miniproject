@@ -1,7 +1,6 @@
 package com.example.miniproject.exception;
 
 import com.example.miniproject.constant.ErrorCode;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AnnualException extends DomainException {
 
-	public AnnualException(ErrorCode errorCode) {
-		super(errorCode);
-	}
+    private ErrorCode errorCode;
+
+    public AnnualException(ErrorCode errorCode) {
+        super(errorCode);
+        this.errorCode = errorCode;
+    }
 }

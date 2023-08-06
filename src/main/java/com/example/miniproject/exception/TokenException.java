@@ -8,13 +8,13 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class TokenException extends DomainException {
+
 	private ErrorCode errorCode;
-	private HttpStatus httpStatus;
-	private String message;
 
 	public TokenException(ErrorCode errorCode) {
 		super(errorCode);
+		this.errorCode = errorCode;
+
 	}
 }
