@@ -49,6 +49,7 @@ public class MemberService {
     // 회원가입
     public void register(CreateMember memberRequestDto) {
 
+        // 회원 중복 체크
         duplicateMemberCheck(memberRequestDto.getEmail());
 
         TotalAnnual totalAnnual = findTotalAnnual(memberRequestDto.getJoin().atStartOfDay());
@@ -72,14 +73,14 @@ public class MemberService {
             throw new MemberException(ErrorCode.MEMBER_PASSWORD_NOT_MATCH);
         }
 
-        // accessToken 유효기간 10분으로 설정 테스트용도
-        String accessToken = jwtService.generateToken(Duration.ofMinutes(10), member);
+        // accessToken 유효기간 5분으로 설정 테스트용도
+        String accessToken = jwtService.generateToken(Duration.ofMinutes(5), member);
 
         // refreshToken 유효기간 1일 설정
         String refreshToken = jwtService.generateToken(Duration.ofDays(1), member);
 
-        // redis 에 refreshToken randomKey 저장
-        String randomKey = UUID.randomUUID().toString();
+        // redis 에 refreshToken (randomKey + 회원의 이메일을 조합한 key) 를 저장
+        String randomKey = UUID.randomUUID() + member.getEmail();
         redisTemplate.opsForValue().set(
                 randomKey, refreshToken,
                 jwtService.extractAllClaim(refreshToken).getExpiresAt().getTime(),
@@ -103,7 +104,7 @@ public class MemberService {
     }
 
     // 로그아웃
-    public void logout(HttpServletRequest request, Authentication authentication) {
+    public void logout(HttpServletRequest request, String refreshTokenId, Authentication authentication) {
 
         // 로그아웃 하려는 토큰이 유효한 지 검증
         String jwt = request.getHeader("Authorization").substring(7);
@@ -116,17 +117,15 @@ public class MemberService {
         Member member = memberRepository.findByEmail(jwtService.extractUsername(jwt))
                 .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
-        // redis 에 회원의 이메일을 key 로 가진 refreshToken 이 존재하는 경우에는 삭제한다.
-        if (redisTemplate.opsForValue().get("RT:" + member.getEmail()) != null) {
-            redisTemplate.delete("RT:" + member.getEmail());
-        }
+        // redis 에 회원의 이메일을 key 로 가진 refreshToken 이 존재하는 경우 또는 refreshTokenId 에 마지막 문자가 회원의 이메일로 끝난다면 삭제
+        if (refreshTokenId.endsWith(member.getEmail()) || redisTemplate.opsForValue().get(refreshTokenId) != null)
+            redisTemplate.delete(refreshTokenId);
 
         // redis 에 BlackList 로 저장
         redisTemplate.opsForValue().set(
                 jwt, "logout",
                 jwtService.extractExpiration(jwt).getTime(),
                 TimeUnit.MILLISECONDS);
-
     }
 
     // 회원 이메일 찾기
@@ -137,7 +136,7 @@ public class MemberService {
 
     // 회원 이메일 중복 체크
     private void duplicateMemberCheck(String email) {
-        if (memberRepository.existsByEmail(email))
+        if (memberRepository.existsByEmail(AESUtil.encrypt(email)))
             throw new MemberException(ErrorCode.MEMBER_EMAIL_DUPLICATED);
     }
 
