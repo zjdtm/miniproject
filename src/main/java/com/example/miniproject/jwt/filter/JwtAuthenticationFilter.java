@@ -1,5 +1,7 @@
 package com.example.miniproject.jwt.filter;
 
+import com.example.miniproject.constant.ErrorCode;
+import com.example.miniproject.exception.TokenException;
 import com.example.miniproject.jwt.service.JwtService;
 import com.example.miniproject.jwt.service.PrincipalDetailService;
 import jakarta.servlet.FilterChain;
@@ -64,7 +66,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }else {
+                    throw new TokenException(ErrorCode.MEMBER_IS_LOGOUT);
                 }
+            }else {
+                throw new TokenException(ErrorCode.TOKEN_NOT_MATCH);
             }
         }
 
