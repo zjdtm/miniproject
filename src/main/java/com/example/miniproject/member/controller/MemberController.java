@@ -8,10 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.example.miniproject.jwt.dto.TokenDto.ResponseToken;
 import static com.example.miniproject.member.dto.MemberRequestDto.CreateMember;
@@ -47,7 +44,7 @@ public class MemberController {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(60 * 60 * 24 * 30)
+                .maxAge(60 * 60 * 24)
                 .sameSite("None")
                 .domain("localhost")
                 .build();
@@ -59,10 +56,11 @@ public class MemberController {
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(
+            @CookieValue("refreshToken") String refreshTokenId,
             HttpServletRequest request, Authentication authentication
     ) {
 
-        memberService.logout(request, authentication);
+        memberService.logout(request, refreshTokenId, authentication);
 
         return ResponseEntity.ok()
                 .body("로그아웃에 성공하였습니다.");
