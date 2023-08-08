@@ -66,6 +66,8 @@ public class Member {
 	private int annualUsed;
 	private int annualRemain;
 
+	private String position;
+
 	public void changeName(String newName) {
 		this.name = newName;
 	}

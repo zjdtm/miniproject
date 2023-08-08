@@ -57,6 +57,7 @@ public class AnnualResponseDto {
 	@Setter
 	public static class MyPageDto {
 		private String name;
+		private String position;
 		private int annualBalance;
 		private int annualUsed;
 		private int annualRemain;
@@ -65,6 +66,7 @@ public class AnnualResponseDto {
 
 		public MyPageDto(Member member, List<AnnualHistroy> annualHistories, List<DutyHistory> dutyHistories) {
 			this.name = AESUtil.decrypt(member.getName());
+			this.position = member.getPosition();
 			this.annualBalance = member.getTotalAnnual().getAnnualAmount();
 			this.annualUsed = member.getAnnualUsed();
 			this.annualRemain = member.getAnnualRemain();
