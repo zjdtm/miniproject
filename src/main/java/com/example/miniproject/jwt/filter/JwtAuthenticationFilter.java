@@ -41,6 +41,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String refreshToken = null;
         Cookie[] cookies = request.getCookies();
+
+        // 쿠키가 없을 때는 다음 필터로
+        if(cookies != null && cookies.length >0) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(REFRESH_TOKEN_COOKIE)) {
                 refreshToken = cookie.getValue();
