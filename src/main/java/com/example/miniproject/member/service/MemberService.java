@@ -92,7 +92,6 @@ public class MemberService {
         );
 
         // 로그인 로그 찾기
-        LoginLog loginLog = loginLogService.findLoginLog(member.getId());
         LoginLogDto.CreateLoginLog createLoginLog = LoginLogDto.CreateLoginLog.builder()
                 .member(member)
                 .userAgent(request.getHeader("User-Agent"))
@@ -100,12 +99,8 @@ public class MemberService {
                 .successLoginDate(LocalDateTime.now())
                 .build();
 
-        // 로그인 로그에 기록이 비어 있다면 저장
-        if(Objects.isNull(loginLog)) {
-            loginLogService.save(createLoginLog);
-        }else { // 로그인 로그에 기록이되어 있다면 업데이트
-            loginLog.updateLogDate(createLoginLog);
-        }
+        // 로그인 로그 저장장
+       loginLogService.save(createLoginLog);
 
         // accessToken, refreshTokenId 를 return
         return ResponseToken.builder()

@@ -20,10 +20,4 @@ public class LoginLogService {
         loginLogRepository.save(loginLog);
     }
 
-    // 로그인 로그에 기록된 회원 찾기
-    public LoginLog findLoginLog(Long userId) {
-        LoginLog loginLog = loginLogRepository.findByMemberId(userId);
-        return loginLog;
-    }
-
 }
