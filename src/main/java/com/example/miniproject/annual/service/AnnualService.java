@@ -72,6 +72,9 @@ public class AnnualService {
 		Annual annual = annualRepository.findById(cancelDto.getId())
 			.orElseThrow(() -> new AnnualException(ErrorCode.ANNUAL_NOT_FOUND));
 
+		if (annual.getStatus() == Status.COMPLETE)
+			throw new AnnualException(ErrorCode.ANNUAL_NOT_MODIFY_CANCEL);
+
 		if (annual.getMember().isNotEqualsEmail(email))
 			throw new AnnualException(ErrorCode.MEMBER_NOT_MATCHED);
 

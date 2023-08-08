@@ -24,7 +24,8 @@ public enum ErrorCode {
 	ANNUAL_TOTAL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자가 사용 가능한 총 연차 수를 찾을 수 없습니다."),
 	MEMBER_NOT_MATCHED(HttpStatus.FORBIDDEN, "연차/당직 수정, 삭제는 작성한 사용자만 가능합니다."),
 	ANNUAL_DATE_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 해당 기간에 신청한 연차가 있습니다."),
-	ANNUAL_NOT_BALANCED_AMOUNT(HttpStatus.BAD_REQUEST, "잔여 연차 수가 부족합니다.");
+	ANNUAL_NOT_BALANCED_AMOUNT(HttpStatus.BAD_REQUEST, "잔여 연차 수가 부족합니다."),
+	ANNUAL_NOT_MODIFY_CANCEL(HttpStatus.BAD_REQUEST, "결재 승인된 연차/당직은 수정/삭제 할 수 없습니다.");
 
 	private HttpStatus status;
 	private String message;
