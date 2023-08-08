@@ -4,32 +4,48 @@ import com.example.miniproject.annual.domain.Annual;
 import com.example.miniproject.member.domain.Member;
 import com.example.miniproject.util.AESUtil;
 import com.example.miniproject.util.DateUtil;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AnnualResponseDto {
     @Getter
     @Setter
     public static class MainDto {
-        private Long id;
-        private String email;
-        private String name;
-        private String category;
-        private String startDate;
-        private String endDate;
-        private String reason;
 
-        public MainDto(Annual annual) {
-            this.id = annual.getId();
-            this.email = AESUtil.decrypt(annual.getMember().getEmail());
-            this.name = AESUtil.decrypt(annual.getMember().getName());
-            this.category = annual.getCategory().getName();
-            this.startDate = annual.getStartedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            this.endDate = annual.getLastedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            this.reason = annual.getReason() == null ? null : annual.getReason().getName();
+        private String username;
+
+        private List<AnnualCalendar> annuals;
+
+        public MainDto(String username, List<Annual> annuals) {
+            this.username = AESUtil.decrypt(username);
+            this.annuals = annuals.stream().map(annual ->
+                    AnnualCalendar.builder()
+                            .id(annual.getId())
+                            .email(AESUtil.decrypt(annual.getMember().getEmail()))
+                            .name(AESUtil.decrypt(annual.getMember().getName()))
+                            .category(annual.getCategory().getName())
+                            .startDate(annual.getStartedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                            .endDate(annual.getLastedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                            .reason(annual.getReason() == null ? null : annual.getReason().getName())
+                            .build()
+                    ).collect(Collectors.toList());
+        }
+
+        @Getter
+        @Setter
+        @Builder
+        @AllArgsConstructor
+        private static class AnnualCalendar {
+            private Long id;
+            private String email;
+            private String name;
+            private String category;
+            private String startDate;
+            private String endDate;
+            private String reason;
         }
     }
 

@@ -19,8 +19,8 @@ public class AnnualController {
     private final AnnualService annualService;
 
     @GetMapping("/main")
-    public List<AnnualResponseDto.MainDto> main() {
-        List<AnnualResponseDto.MainDto> mainDtos = annualService.findAll();
+    public AnnualResponseDto.MainDto main(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        AnnualResponseDto.MainDto mainDtos = annualService.findAll(principalDetails.getUsername());
 
         return mainDtos;
     }
