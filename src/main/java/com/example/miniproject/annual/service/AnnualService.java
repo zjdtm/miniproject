@@ -6,6 +6,7 @@ import com.example.miniproject.annual.dto.AnnualResponseDto;
 import com.example.miniproject.annual.repository.AnnualRepository;
 import com.example.miniproject.constant.Category;
 import com.example.miniproject.constant.ErrorCode;
+import com.example.miniproject.constant.Status;
 import com.example.miniproject.exception.AnnualException;
 import com.example.miniproject.exception.MemberException;
 import com.example.miniproject.member.domain.Member;
@@ -31,7 +32,7 @@ public class AnnualService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberException(ErrorCode.TOKEN_NOT_FOUND));
 
-        List<Annual> annuals = annualRepository.findAll();
+        List<Annual> annuals = annualRepository.findAllByStatus(Status.COMPLETE);
 
         return new AnnualResponseDto.MainDto(member.getName(), annuals);
     }
