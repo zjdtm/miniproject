@@ -30,6 +30,7 @@ public class AnnualResponseDto {
 					.id(annual.getId())
 					.email(AESUtil.decrypt(annual.getMember().getEmail()))
 					.name(AESUtil.decrypt(annual.getMember().getName()))
+					.title(annual.getTitle())
 					.category(annual.getCategory().getName())
 					.startDate(annual.getStartedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
 					.endDate(annual.getLastedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
@@ -46,6 +47,7 @@ public class AnnualResponseDto {
 			private Long id;
 			private String email;
 			private String name;
+			private String title;
 			private String category;
 			private String startDate;
 			private String endDate;
