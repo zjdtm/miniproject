@@ -6,6 +6,7 @@ import com.example.miniproject.exception.TokenException;
 import com.example.miniproject.jwt.dto.TokenDto.ResponseToken;
 import com.example.miniproject.jwt.service.JwtService;
 import com.example.miniproject.jwt.service.PrincipalDetailService;
+import com.example.miniproject.loginLog.domain.LoginLog;
 import com.example.miniproject.loginLog.dto.LoginLogDto;
 import com.example.miniproject.loginLog.service.LoginLogService;
 import com.example.miniproject.member.domain.Member;
@@ -17,12 +18,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -74,57 +78,61 @@ public class MemberService {
         }
 
         // accessToken 유효기간 5분으로 설정 테스트용도
-        String accessToken = jwtService.generateToken(Duration.ofMinutes(5), member);
+        String accessToken = jwtService.generateToken(Duration.ofMinutes(5), member.getEmail());
 
         // refreshToken 유효기간 1일 설정
-        String refreshToken = jwtService.generateToken(Duration.ofDays(1), member);
+        String refreshTokenId = UUID.randomUUID().toString();
+        String refreshToken = jwtService.generateToken(Duration.ofDays(1), member.getEmail());
 
-        // redis 에 refreshToken (randomKey + 회원의 이메일을 조합한 key) 를 저장
-        String randomKey = UUID.randomUUID() + member.getEmail();
+        // redis 에 refreshToken 을 저장
         redisTemplate.opsForValue().set(
-                randomKey, refreshToken,
-                jwtService.extractAllClaim(refreshToken).getExpiresAt().getTime(),
+                refreshTokenId, refreshToken,
+                jwtService.extractExpiration(refreshToken).getTime() - new Date().getTime(),
                 TimeUnit.MILLISECONDS
         );
 
-        // loginLog 저장
-        loginLogService.save(LoginLogDto.CreateLoginLog.builder()
+        // 로그인 로그 찾기
+        LoginLog loginLog = loginLogService.findLoginLog(member.getId());
+        LoginLogDto.CreateLoginLog createLoginLog = LoginLogDto.CreateLoginLog.builder()
                 .member(member)
                 .userAgent(request.getHeader("User-Agent"))
                 .clientIp(request.getRemoteAddr())  // TODO : ip6 형식을 ip4 형식으로 설정을 해줘야 함
                 .successLoginDate(LocalDateTime.now())
-                .build());
-
-        // accessToken, refreshToken 은 return
-        return ResponseToken.builder()
-                .accessToken(accessToken)
-                .refreshToken(randomKey)
                 .build();
 
+        // 로그인 로그에 기록이 비어 있다면 저장
+        if(Objects.isNull(loginLog)) {
+            loginLogService.save(createLoginLog);
+        }else { // 로그인 로그에 기록이되어 있다면 업데이트
+            loginLog.updateLogDate(createLoginLog);
+        }
+
+        // accessToken, refreshTokenId 를 return
+        return ResponseToken.builder()
+                .accessToken(accessToken)
+                .refreshTokenId(refreshTokenId)
+                .build();
     }
 
     // 로그아웃
     public void logout(HttpServletRequest request, String refreshTokenId, Authentication authentication) {
 
-        // 로그아웃 하려는 토큰이 유효한 지 검증
-        String jwt = request.getHeader("Authorization").substring(7);
+        // Header 에서 accessToken 을 찾는다.
+        String accessToken = request.getHeader("Authorization").substring(7);
 
-        if (!jwtService.validToken(jwt, principalDetailService.loadUserByUsername(authentication.getName()))) {
+        // UserDetails 에서 회원의 정보를 찾는다.
+        UserDetails userDetails = principalDetailService.loadUserByUsername(authentication.getName());
+
+        // 토큰의 유효성을 검증한다.
+        if (!jwtService.validToken(accessToken, userDetails.getUsername())) {
             throw new TokenException(ErrorCode.TOKEN_NOT_MATCH);
         }
 
-        // 토큰에서 회원에 email 을 추출한 후 회원을 찾는다
-        Member member = memberRepository.findByEmail(jwtService.extractUsername(jwt))
-                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
-
-        // redis 에 회원의 이메일을 key 로 가진 refreshToken 이 존재하는 경우 또는 refreshTokenId 에 마지막 문자가 회원의 이메일로 끝난다면 삭제
-        if (refreshTokenId.endsWith(member.getEmail()) || redisTemplate.opsForValue().get(refreshTokenId) != null)
-            redisTemplate.delete(refreshTokenId);
-
         // redis 에 BlackList 로 저장
+        redisTemplate.delete(refreshTokenId);
         redisTemplate.opsForValue().set(
-                jwt, "logout",
-                jwtService.extractExpiration(jwt).getTime(),
+                accessToken, "logout",
+                jwtService.extractExpiration(accessToken).getTime() - new Date().getTime(),
                 TimeUnit.MILLISECONDS);
     }
 
