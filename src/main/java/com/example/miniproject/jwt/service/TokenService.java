@@ -36,7 +36,7 @@ public class TokenService {
         Member findMember = memberService.findByEmail(extractUsername);
 
         // 새로운 accessToken 생성
-        String newAccessToken = jwtService.generateToken(Duration.ofMinutes(1), findMember.getEmail());
+        String newAccessToken = jwtService.generateToken(Duration.ofMinutes(5), findMember.getEmail());
 
         // 새로운 refreshToken 생성
         String newRefreshTokenId = UUID.randomUUID().toString();
