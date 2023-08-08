@@ -45,7 +45,7 @@ public class MemberController {
 
         ResponseToken responseToken = memberService.login(request, memberRequestDto);
 
-        // Cookie 에 refreshToken 을 저장함 이때 value 값은 UUID.randomUUID() !!
+        // Cookie 에 refreshToken 을 저장함 이때 key 값은 UUID.randomUUID() !!
         ResponseCookie responseCookie = ResponseCookie.from("refreshToken", responseToken.getRefreshTokenId())
                 .httpOnly(true)
                 .secure(true)
