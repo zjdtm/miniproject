@@ -1,6 +1,7 @@
 package com.example.miniproject.member.controller;
 
 import com.example.miniproject.jwt.service.TokenService;
+import com.example.miniproject.member.dto.MemberResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -20,7 +21,7 @@ public class TokenApiController {
     private final TokenService tokenService;
 
     @PostMapping("/token")
-    public ResponseEntity<String> createNewAccessToken(
+    public ResponseEntity<Object> createNewAccessToken(
             @CookieValue("refreshToken") String refreshTokenId
     ) {
 
@@ -37,7 +38,9 @@ public class TokenApiController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .body(responseToken.getAccessToken());
+                .body(MemberResponseDto.ResponseAccessToken.builder()
+                        .accessToken(responseToken.getAccessToken())
+                        .build());
     }
 
 }
