@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import static com.example.miniproject.jwt.dto.TokenDto.ResponseToken;
 import static com.example.miniproject.member.dto.MemberRequestDto.CreateMember;
 import static com.example.miniproject.member.dto.MemberRequestDto.LoginMember;
+import static com.example.miniproject.member.dto.MemberResponseDto.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,17 +24,21 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(
+    public ResponseEntity<Object> register(
             @RequestBody @Valid CreateMember memberRequestDto
     ) {
 
         memberService.register(memberRequestDto);
 
-        return ResponseEntity.ok().body("회원가입에 성공하였습니다.");
+        return ResponseEntity.ok()
+                .body(ResponseSuccess.builder()
+                        .status(HttpStatus.OK.value())
+                        .message("회원가입에 성공하였습니다.")
+                        .build());
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(
+    public ResponseEntity<Object> login(
             HttpServletRequest request,
             @RequestBody @Valid LoginMember memberRequestDto
     ) {
@@ -40,7 +46,7 @@ public class MemberController {
         ResponseToken responseToken = memberService.login(request, memberRequestDto);
 
         // Cookie 에 refreshToken 을 저장함 이때 value 값은 UUID.randomUUID() !!
-        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", responseToken.getRefreshToken())
+        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", responseToken.getRefreshTokenId())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -51,11 +57,13 @@ public class MemberController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
-                .body(responseToken.getAccessToken());
+                .body(ResponseAccessToken.builder()
+                        .accessToken(responseToken.getAccessToken())
+                        .build());
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(
+    public ResponseEntity<Object> logout(
             @CookieValue("refreshToken") String refreshTokenId,
             HttpServletRequest request, Authentication authentication
     ) {
@@ -63,7 +71,10 @@ public class MemberController {
         memberService.logout(request, refreshTokenId, authentication);
 
         return ResponseEntity.ok()
-                .body("로그아웃에 성공하였습니다.");
+                .body(ResponseSuccess.builder()
+                        .status(HttpStatus.OK.value())
+                        .message("로그아웃에 성공하였습니다.")
+                        .build());
     }
 
 }
