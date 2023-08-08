@@ -23,6 +23,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             ObjectMapper objectMapper = new ObjectMapper();
             ErrorResponse errorResponse = new ErrorResponse(e.getErrorCode());
 
+            response.setStatus(e.getHttpStatus().value());
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(
