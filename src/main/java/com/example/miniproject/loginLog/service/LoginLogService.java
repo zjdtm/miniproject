@@ -14,9 +14,16 @@ public class LoginLogService {
 
     private final LoginLogRepository loginLogRepository;
 
+    // 로그인 로그 저장
     public void save(LoginLogDto.CreateLoginLog createLoginLog) {
         LoginLog loginLog = createLoginLog.toEntity();
         loginLogRepository.save(loginLog);
+    }
+
+    // 로그인 로그에 기록된 회원 찾기
+    public LoginLog findLoginLog(Long userId) {
+        LoginLog loginLog = loginLogRepository.findByMemberId(userId);
+        return loginLog;
     }
 
 }
