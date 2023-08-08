@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	private final AdminService adminService;
 
-	@GetMapping("/")
+	@GetMapping("")
 	public List<AdminResponseDto.MainDto> main() {
 		List<AdminResponseDto.MainDto> mainDtos = adminService.getAnnuals();
 
