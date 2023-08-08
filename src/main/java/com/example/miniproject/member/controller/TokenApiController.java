@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,12 +21,12 @@ public class TokenApiController {
 
     @PostMapping("/token")
     public ResponseEntity<String> createNewAccessToken(
-            @CookieValue("refreshToken") String refreshTokenId, Authentication authentication
+            @CookieValue("refreshToken") String refreshTokenId
     ) {
 
-        ResponseToken responseToken = tokenService.createNewTokens(refreshTokenId, authentication);
+        ResponseToken responseToken = tokenService.createNewTokens(refreshTokenId);
 
-        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", responseToken.getRefreshToken())
+        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", responseToken.getRefreshTokenId())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")

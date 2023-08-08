@@ -27,10 +27,13 @@ public class AnnualService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final EntityManager entityManager;
 
-    public List<AnnualResponseDto.MainDto> findAll() {
+    public AnnualResponseDto.MainDto findAll(String email) {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberException(ErrorCode.TOKEN_NOT_FOUND));
+
         List<Annual> annuals = annualRepository.findAll();
 
-        return annuals.stream().map(annual -> new AnnualResponseDto.MainDto(annual)).collect(Collectors.toList());
+        return new AnnualResponseDto.MainDto(member.getName(), annuals);
     }
 
     @Transactional

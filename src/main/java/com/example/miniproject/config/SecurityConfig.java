@@ -33,7 +33,8 @@ public class SecurityConfig {
                 ) // 세션을 사용하지 않도록 STATELESS 를 적용
                 .addFilter(corsFilter)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/register", "/api/login").permitAll()
+                        .requestMatchers("/api/register", "/api/login", "/api/token").permitAll()
+                        .requestMatchers("/api/main", "/api/annual/**", "/api/user").hasAuthority(Role.USER.toString())
                         .requestMatchers("/api/admin/**").hasAuthority(Role.ADMIN.toString())
                         .anyRequest().authenticated()
                 )

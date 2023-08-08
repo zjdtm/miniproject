@@ -1,5 +1,6 @@
 package com.example.miniproject.loginLog.domain;
 
+import com.example.miniproject.loginLog.dto.LoginLogDto;
 import com.example.miniproject.member.domain.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -34,4 +35,10 @@ public class LoginLog {
     @CreationTimestamp
     private LocalDateTime successLoginDate;
 
+    public void updateLogDate(LoginLogDto.CreateLoginLog loginLogDto) {
+        this.member = loginLogDto.getMember();
+        this.userAgent = loginLogDto.getUserAgent();
+        this.successLoginDate = loginLogDto.getSuccessLoginDate();
+        this.clientIp = loginLogDto.getClientIp();
+    }
 }
