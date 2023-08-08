@@ -22,7 +22,9 @@ public enum ErrorCode {
 	TOKEN_NOT_FOUND(HttpStatus.FORBIDDEN, "인증 정보가 만료되었습니다."),
 	TOKEN_NOT_MATCH(HttpStatus.BAD_REQUEST, "인증 정보가 일치하지 않습니다."),
 	ANNUAL_TOTAL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 사용자가 사용 가능한 총 연차 수를 찾을 수 없습니다."),
-	MEMBER_NOT_MATCHED(HttpStatus.FORBIDDEN, "연차/당직 수정, 삭제는 작성한 사용자만 가능합니다.");
+	MEMBER_NOT_MATCHED(HttpStatus.FORBIDDEN, "연차/당직 수정, 삭제는 작성한 사용자만 가능합니다."),
+	ANNUAL_DATE_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 해당 기간에 신청한 연차가 있습니다."),
+	ANNUAL_NOT_BALANCED_AMOUNT(HttpStatus.BAD_REQUEST, "잔여 연차 수가 부족합니다.");
 
 	private HttpStatus status;
 	private String message;
