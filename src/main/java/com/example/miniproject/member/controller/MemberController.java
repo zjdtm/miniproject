@@ -11,10 +11,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.miniproject.jwt.dto.TokenDto.ResponseToken;
+import java.util.Map;
+
 import static com.example.miniproject.member.dto.MemberRequestDto.CreateMember;
 import static com.example.miniproject.member.dto.MemberRequestDto.LoginMember;
-import static com.example.miniproject.member.dto.MemberResponseDto.*;
+import static com.example.miniproject.member.dto.MemberResponseDto.ResponseAccessToken;
+import static com.example.miniproject.member.dto.MemberResponseDto.ResponseSuccess;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,10 +45,10 @@ public class MemberController {
             @RequestBody @Valid LoginMember memberRequestDto
     ) {
 
-        ResponseToken responseToken = memberService.login(request, memberRequestDto);
+        Map<String, String> response = memberService.login(request, memberRequestDto);
 
         // Cookie 에 refreshToken 을 저장함 이때 key 값은 UUID.randomUUID() !!
-        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", responseToken.getRefreshTokenId())
+        ResponseCookie responseCookie = ResponseCookie.from("refreshToken", response.get("refreshTokenId"))
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -58,7 +60,8 @@ public class MemberController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body(ResponseAccessToken.builder()
-                        .accessToken(responseToken.getAccessToken())
+                        .accessToken(response.get("accessToken"))
+                        .role(response.get("role"))
                         .build());
     }
 

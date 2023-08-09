@@ -10,7 +10,11 @@ public class MemberResponseDto {
     @Setter
     @Builder
     public static class ResponseAccessToken {
+
         private String accessToken;
+
+        private String role;
+
     }
 
     @Getter

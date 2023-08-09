@@ -3,10 +3,8 @@ package com.example.miniproject.member.service;
 import com.example.miniproject.constant.ErrorCode;
 import com.example.miniproject.exception.MemberException;
 import com.example.miniproject.exception.TokenException;
-import com.example.miniproject.jwt.dto.TokenDto.ResponseToken;
 import com.example.miniproject.jwt.service.JwtService;
 import com.example.miniproject.jwt.service.PrincipalDetailService;
-import com.example.miniproject.loginLog.domain.LoginLog;
 import com.example.miniproject.loginLog.dto.LoginLogDto;
 import com.example.miniproject.loginLog.service.LoginLogService;
 import com.example.miniproject.member.domain.Member;
@@ -26,7 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Objects;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -66,7 +65,7 @@ public class MemberService {
     }
 
     // 로그인
-    public ResponseToken login(HttpServletRequest request, LoginMember memberRequestDto) {
+    public Map<String, String> login(HttpServletRequest request, LoginMember memberRequestDto) {
 
         // 회원이 존재하는지 검증
         Member member = memberRepository.findByEmail(AESUtil.encrypt(memberRequestDto.getEmail()))
@@ -99,14 +98,16 @@ public class MemberService {
                 .successLoginDate(LocalDateTime.now())
                 .build();
 
-        // 로그인 로그 저장장
-       loginLogService.save(createLoginLog);
+        // 로그인 로그 저장
+        loginLogService.save(createLoginLog);
 
-        // accessToken, refreshTokenId 를 return
-        return ResponseToken.builder()
-                .accessToken(accessToken)
-                .refreshTokenId(refreshTokenId)
-                .build();
+        // hashMap 에 응답으로 보낼 값들을 넣어주고 return 한다.
+        HashMap<String, String> response = new HashMap<>();
+        response.put("accessToken", accessToken);
+        response.put("refreshTokenId", refreshTokenId);
+        response.put("role", member.getRole().getName());
+
+        return response;
     }
 
     // 로그아웃

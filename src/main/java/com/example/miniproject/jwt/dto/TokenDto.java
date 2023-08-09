@@ -17,11 +17,11 @@ public class TokenDto {
     @Getter
     @Builder
     @AllArgsConstructor
-    public static class ResponseToken {
+    public static class ResponseTokenAndRole {
 
         private String accessToken;
 
-        private String refreshTokenId;
+        private String role;
 
     }
 

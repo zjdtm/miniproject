@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import static com.example.miniproject.jwt.dto.TokenDto.ResponseToken;
 
 @RequiredArgsConstructor
 @Service
@@ -24,7 +24,7 @@ public class TokenService {
     private final PrincipalDetailService principalDetailService;
     private final MemberService memberService;
 
-    public ResponseToken createNewTokens(String refreshTokenId) {
+    public Map<String, String> createNewTokens(String refreshTokenId) {
 
         // redis 에 저장된 refreshToken 을 찾는다.
         String refreshToken = redisTemplate.opsForValue().get(refreshTokenId).toString();
@@ -51,10 +51,13 @@ public class TokenService {
                 TimeUnit.MILLISECONDS
         );
 
-        return ResponseToken.builder()
-                .accessToken(newAccessToken)
-                .refreshTokenId(newRefreshTokenId)
-                .build();
+        // hashMap 에 응답으로 보낼 값들을 넣어주고 return 한다.
+        HashMap<String, String> response = new HashMap<>();
+        response.put("accessToken", newAccessToken);
+        response.put("refreshTokenId", newRefreshTokenId);
+        response.put("role", findMember.getRole().getName());
+
+        return response;
 
     }
 
